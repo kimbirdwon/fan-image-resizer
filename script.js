@@ -3,7 +3,6 @@ const preview = document.getElementById("preview");
 const download = document.getElementById("download");
 const widthInput = document.getElementById("width_cm");
 
-// 팬 전체 18cm 기준 → 캔버스 고정 (웹용 픽셀, 예: 500px)
 const panelCm = 18;
 const canvasSize = 500;
 const canvas = document.createElement("canvas");
@@ -52,40 +51,10 @@ function drawCanvas(userCm) {
     const offsetY = Math.round((canvasSize - imgHeight) / 2);
     ctx.drawImage(originalImage, offsetX, offsetY, imgWidth, imgHeight);
 
-    // 미리보기 (PNG)
+    // 미리보기
     preview.src = canvas.toDataURL("image/png");
-}
 
-// 다운로드 버튼 클릭 → JPG 강제 다운로드
-download.addEventListener("click", function(e){
-    e.preventDefault();
-    if (!originalImage) return;
-
-    // 1. 새 캔버스 생성 (JPG용)
-    const jpgCanvas = document.createElement("canvas");
-    jpgCanvas.width = canvasSize;
-    jpgCanvas.height = canvasSize;
-    const jpgCtx = jpgCanvas.getContext("2d");
-
-    // 2. 검정 배경 채우기
-    jpgCtx.fillStyle = "black";
-    jpgCtx.fillRect(0, 0, canvasSize, canvasSize);
-
-    // 3. 이미지 중앙 배치
-    const userCm = parseFloat(widthInput.value) || 5;
-    const ratio = userCm / panelCm;
-    const imgWidth = Math.round(canvasSize * ratio);
-    const imgHeight = Math.round(imgWidth * (originalImage.height / originalImage.width));
-    const offsetX = Math.round((canvasSize - imgWidth) / 2);
-    const offsetY = Math.round((canvasSize - imgHeight) / 2);
-    jpgCtx.drawImage(originalImage, offsetX, offsetY, imgWidth, imgHeight);
-
-    // 4. JPG 강제 다운로드
-    const jpgUrl = jpgCanvas.toDataURL("image/jpeg", 0.95);
-    const a = document.createElement("a");
-    a.href = jpgUrl;
-    a.download = "resized.jpg";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // 다운로드 (PNG)
+    download.href = canvas.toDataURL("image/png");
+    download.download = "resized.png";
 });
