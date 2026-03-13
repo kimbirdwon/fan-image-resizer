@@ -53,15 +53,26 @@ function drawCanvas(userCm) {
     const newWidthPx = Math.round(originalWidth * ratio)
     const newHeightPx = Math.round(newWidthPx / aspectRatio)
 
+    // 정사각형 Canvas 크기
+    const size = Math.max(newWidthPx, newHeightPx)
     const canvas = document.createElement("canvas")
-    canvas.width = newWidthPx
-    canvas.height = newHeightPx
+    canvas.width = size
+    canvas.height = size
 
     const ctx = canvas.getContext("2d")
+
+    // 배경 검정색
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0, size, size)
+
+    // 이미지 중앙 배치
+    const offsetX = Math.round((size - newWidthPx) / 2)
+    const offsetY = Math.round((size - newHeightPx) / 2)
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = "high"
-    ctx.drawImage(originalImage, 0, 0, newWidthPx, newHeightPx)
+    ctx.drawImage(originalImage, offsetX, offsetY, newWidthPx, newHeightPx)
 
+    // 미리보기 & 다운로드
     const resizedImage = canvas.toDataURL("image/png")
     preview.src = resizedImage
     download.href = resizedImage
