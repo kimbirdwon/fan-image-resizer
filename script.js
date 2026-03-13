@@ -3,7 +3,7 @@ const preview = document.getElementById("preview");
 const download = document.getElementById("download");
 const widthInput = document.getElementById("width_cm");
 
-// 팬 전체 18cm 기준 → Canvas 고정 (웹용 픽셀, 예: 500px)
+// 팬 전체 18cm 기준 → 캔버스 고정 (웹용 픽셀, 예: 500px)
 const panelCm = 18;
 const canvasSize = 500;
 const canvas = document.createElement("canvas");
@@ -57,8 +57,14 @@ function drawCanvas(userCm) {
 
     // 미리보기 (PNG)
     preview.src = canvas.toDataURL("image/png");
-
-    // 다운로드 (JPG)
-    download.href = canvas.toDataURL("image/jpeg", 0.95); // 95% 품질
-    download.download = "resized.jpg";
 }
+
+// 다운로드 버튼 클릭 → JPG 강제 다운로드
+download.addEventListener("click", function(e){
+    e.preventDefault(); // 기본 이동 방지
+    const jpgUrl = canvas.toDataURL("image/jpeg", 0.95); // JPG 95% 품질
+    const a = document.createElement("a");
+    a.href = jpgUrl;
+    a.download = "resized.jpg";
+    a.click();
+});
