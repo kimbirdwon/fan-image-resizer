@@ -8,11 +8,8 @@ let originalImage = null
 let originalWidth = 0
 let originalHeight = 0
 let aspectRatio = 1
-
-// 팬 실제 가로(cm)
 const panelCm = 18
 
-// 이미지 업로드 처리
 upload.addEventListener("change", function() {
     const file = upload.files[0]
     if (!file) return
@@ -24,14 +21,11 @@ upload.addEventListener("change", function() {
         originalWidth = img.width
         originalHeight = img.height
         aspectRatio = originalWidth / originalHeight
-
-        // 초기값
-        widthInput.value = 5  // 기본 5cm
-        drawCanvas(5)          // 기본 5cm로 미리보기
+        widthInput.value = 5
+        drawCanvas(5)
     }
 })
 
-// 리사이즈 버튼 클릭
 resizeBtn.addEventListener("click", function() {
     if (!originalImage) {
         alert("이미지를 먼저 선택해주세요")
@@ -47,36 +41,32 @@ resizeBtn.addEventListener("click", function() {
     drawCanvas(userCm)
 })
 
-// Canvas 그리는 함수 (검정 배경 포함)
 function drawCanvas(userCm) {
     const ratio = userCm / panelCm
-    const newWidthPx = Math.round(originalWidth * ratio)
-    const newHeightPx = Math.round(newWidthPx / aspectRatio)
+    const imgWidth = Math.round(originalWidth * ratio)
+    const imgHeight = Math.round(imgWidth / aspectRatio)
 
-    // 정사각형 Canvas (이미지보다 약간 크게)
-    const padding = 20 // 여백
-    const size = Math.max(newWidthPx, newHeightPx) + padding * 2
+    // 정사각형 Canvas: 이미지 최대 크기 기준 + 여백
+    const padding = 20
+    const canvasSize = Math.max(imgWidth, imgHeight) + padding * 2
 
     const canvas = document.createElement("canvas")
-    canvas.width = size
-    canvas.height = size
+    canvas.width = canvasSize
+    canvas.height = canvasSize
 
     const ctx = canvas.getContext("2d")
 
-    // ✅ 배경 검정색 (Canvas 생성 직후)
+    // 1️⃣ 배경 검정색
     ctx.fillStyle = "black"
-    ctx.fillRect(0, 0, size, size)
+    ctx.fillRect(0, 0, canvasSize, canvasSize)
 
-    // 이미지 중앙 배치
-    const offsetX = Math.round((size - newWidthPx) / 2)
-    const offsetY = Math.round((size - newHeightPx) / 2)
-    ctx.imageSmoothingEnabled = true
-    ctx.imageSmoothingQuality = "high"
-    ctx.drawImage(originalImage, offsetX, offsetY, newWidthPx, newHeightPx)
+    // 2️⃣ 이미지 중앙에 배치
+    const offsetX = Math.round((canvasSize - imgWidth) / 2)
+    const offsetY = Math.round((canvasSize - imgHeight) / 2)
+    ctx.drawImage(originalImage, offsetX, offsetY, imgWidth, imgHeight)
 
-    // 미리보기 & 다운로드
-    const resizedImage = canvas.toDataURL("image/png")
-    preview.src = resizedImage
-    download.href = resizedImage
+    // 3️⃣ 미리보기 & 다운로드
+    preview.src = canvas.toDataURL("image/png")
+    download.href = canvas.toDataURL("image/png")
     download.download = "resized.png"
 }
