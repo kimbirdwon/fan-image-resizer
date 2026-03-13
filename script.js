@@ -1,10 +1,15 @@
+// HTML 요소
 const upload = document.getElementById("upload");
 const preview = document.getElementById("preview");
 const download = document.getElementById("download");
 const widthInput = document.getElementById("width_cm");
+const resizeBtn = document.getElementById("resizeBtn");
 
+// 설정
 const panelCm = 18;      // 팬 전체 가로(cm)
-const canvasSize = 500;   // 캔버스 고정 크기 (px)
+const canvasSize = 500;   // 캔버스 고정 크기(px)
+
+// 캔버스 생성
 const canvas = document.createElement("canvas");
 canvas.width = canvasSize;
 canvas.height = canvasSize;
@@ -17,24 +22,33 @@ ctx.fillRect(0, 0, canvasSize, canvasSize);
 let originalImage = null;
 
 // 이미지 업로드 이벤트
-upload.addEventListener("change", function() {
+upload.addEventListener("change", () => {
     const file = upload.files[0];
     if (!file) return;
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
-    img.onload = function() {
+    img.onload = () => {
         originalImage = img;
         drawCanvas(parseFloat(widthInput.value) || 5);
     };
 });
 
 // cm 입력 변경 이벤트
-widthInput.addEventListener("input", function() {
+widthInput.addEventListener("input", () => {
     if (originalImage) drawCanvas(parseFloat(widthInput.value));
 });
 
-// 투명 여백 자동 크롭 함수
+// 리사이즈 버튼 클릭 이벤트
+resizeBtn.addEventListener("click", () => {
+    if (!originalImage) {
+        alert("이미지를 선택하세요");
+        return;
+    }
+    drawCanvas(parseFloat(widthInput.value));
+});
+
+// 투명 여백 크롭 함수
 function cropTransparentEdges(image) {
     const tmpCanvas = document.createElement("canvas");
     tmpCanvas.width = image.width;
@@ -48,17 +62,22 @@ function cropTransparentEdges(image) {
     let minX = tmpCanvas.width, minY = tmpCanvas.height;
     let maxX = 0, maxY = 0;
 
-    for(let y = 0; y < tmpCanvas.height; y++){
-        for(let x = 0; x < tmpCanvas.width; x++){
+    for (let y = 0; y < tmpCanvas.height; y++) {
+        for (let x = 0; x < tmpCanvas.width; x++) {
             const idx = (y * tmpCanvas.width + x) * 4;
             const alpha = data[idx + 3];
-            if(alpha > 0){
-                if(x < minX) minX = x;
-                if(x > maxX) maxX = x;
-                if(y < minY) minY = y;
-                if(y > maxY) maxY = y;
+            if (alpha > 0) {
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
             }
         }
+    }
+
+    // 모든 픽셀이 투명인 경우
+    if (minX > maxX || minY > maxY) {
+        return tmpCanvas; // 원본 반환
     }
 
     const croppedWidth = maxX - minX + 1;
@@ -73,23 +92,23 @@ function cropTransparentEdges(image) {
     return croppedCanvas;
 }
 
-// 메인 캔버스 그리기 (리사이즈 + 중앙 배치)
+// 메인 캔버스 그리기
 function drawCanvas(userCm) {
     if (!originalImage) return;
 
-    // 기본값 5cm
+    // 기본값 적용
     if (!userCm || userCm <= 0 || userCm > panelCm) {
         userCm = 5;
         widthInput.value = 5;
     }
 
-    // 투명 영역 제거
+    // 투명 여백 제거
     const croppedCanvas = cropTransparentEdges(originalImage);
 
-    // cm → 픽셀 변환
+    // cm → 픽셀 비율
     const ratio = userCm / panelCm;
-    const imgWidth = Math.round(canvasSize * ratio);
-    const imgHeight = Math.round(imgWidth * (croppedCanvas.height / croppedCanvas.width));
+    const imgWidth = Math.round(croppedCanvas.width * ratio);
+    const imgHeight = Math.round(croppedCanvas.height * ratio);
 
     // 캔버스 초기화 + 검정 배경
     ctx.fillStyle = "black";
