@@ -2,21 +2,36 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>투명 테두리 크롭 + 리사이즈</title>
+<title>프레시버거 | 홀로그램 이미지 편집기</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h3>이미지 업로드</h3>
-<input type="file" id="upload" accept="image/*"><br><br>
+<div class="container">
+    <img src="images/logo.png" class="logo">
+    <hr class="divider">
+    <h3>홀로그램 이미지 편집기</h3>
+    <p class="desc">
+    홀로그램 팬에 표시할 이미지를 실제 출력 크기에 맞게 조절하고 상품명을 추가할 수 있습니다.
+    </p>
 
-<label>가로(cm, 최대 18cm): </label>
-<input type="number" id="width_cm" value="5" min="1" max="18">
-<input type="text" id="text_input" placeholder="여기에 글씨 입력">
-<button id="resizeBtn">리사이즈</button><br><br>
+    <!-- 파일 업로드 -->
+    <input type="file" id="upload" accept="image/*" hidden>
+    <label for="upload" class="file-btn">이미지 업로드</label>
 
-<img id="preview" alt="Preview">
-<a id="download">다운로드</a>
+    <!-- 입력창 세로 정렬 -->
+    <input type="number" id="width_cm" min="1" max="18" placeholder="가로 크기(cm) 입력">
+    <input type="text" id="text_input" placeholder="상품명 입력">
+
+    <!-- 버튼 -->
+    <button id="resizeBtn">변환</button>
+
+    <!-- 미리보기 이미지 -->
+    <img id="preview">
+
+    <!-- 다운로드 링크 -->
+    <a id="download">다운로드</a>
+</div>
 
 <script src="script.js"></script>
 </body>
