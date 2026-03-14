@@ -3,7 +3,7 @@ const preview = document.getElementById("preview");
 const download = document.getElementById("download");
 const widthInput = document.getElementById("width_cm");
 
-const panelCm = 18;
+const panelCm = 18; // 팬 사이즈
 const canvasSize = 500;
 const canvas = document.createElement("canvas");
 canvas.width = canvasSize;
